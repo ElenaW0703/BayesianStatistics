@@ -7,12 +7,18 @@ Hierarchical Modeling Exploration and relative code & pdf product \
 *MissingImputation.Rmd* & *MissingImputation.pdf*: \
 Missing Data Imputation by Bayesian Method and relative code & pdf product \
 The details of the questions: \
-1. PH7.5 \
-Imputation: The file interexp.dat contains data from an experiment that was interrupted before all the data could be gathered. Of interest was the difference in reaction times of experimental subjects when they were given stimulus A versus stimulus B. Each subject is tested under one of the two stimuli on their first day of participation in the study, and is tested under the other stimulus at some later date. Unfortunately the experiment was interrupted before it was finished, leaving the researchers with 26 subjects with both A and B responses, 15 subjects with only A responses and 17 subjects with only B responses. \
-<img width="502" alt="ph75" src="https://user-images.githubusercontent.com/120523258/207549122-645f41b7-4949-4585-bdc7-9e18ebbc5e51.png">
+1. PH7.5
+![image](https://user-images.githubusercontent.com/120523258/207549395-48d5cac1-cfb7-4f4f-87ec-cc6b0376cc8e.png)
 
+2. PH7.6 
+![image](https://user-images.githubusercontent.com/120523258/207549318-ebadcebe-7662-4399-8fc4-ea330e7d6118.png)
 
-2. PH7.6 \
-a)
+*MultivariateNormalModel.Rmd* & *MultivariateNormalModel.pdf*: \
+Multivariate Normal Model and relative code & pdf product \
+The details of the questions: \
+1. PH7.3
+![image](https://user-images.githubusercontent.com/120523258/207552048-592ac1b7-ef5d-4aef-92cd-9e3a59bf1d47.png)
 
-b)
+2. ph7.4
+![image](https://user-images.githubusercontent.com/120523258/207552121-fa6efcc9-4b9f-4e07-85af-9a0bbac7e3ce.png)
+![image](https://user-images.githubusercontent.com/120523258/207552202-d69f4cac-69ee-4f43-91d7-38a26593fbfd.png)
