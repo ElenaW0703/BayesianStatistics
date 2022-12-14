@@ -1,5 +1,5 @@
 ---
-title: "Lab8_STA602"
+title: "Hamiltonian Monte Carlo"
 author: "ElenaW."
 date: "11/1/2021"
 output: 
