@@ -1,5 +1,5 @@
 ---
-title: "Homework8_STA602"
+title: "MultivariateNormalModel_Homework8"
 author: "ElenaW."
 date: "10/26/2021"
 output: 
