@@ -1,0 +1,125 @@
+---
+title: "Lab8_STA602"
+author: "ElenaW."
+date: "11/1/2021"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r}
+require(tidyverse)
+require(rstanarm)
+require(magrittr)
+require(rstan)
+require(bayesplot)
+require(loo)
+require(readxl)
+require(plyr)
+```
+
+## Exercise 4
+
+```{r}
+normal_gibbs_sampler = function(S, X, rho){
+  theta_1 = 0
+  theta_2 = 0
+  xbar_1 = colMeans(X)[1]
+  xbar_2 = colMeans(X)[2]
+  theta = matrix(0, nrow = S, ncol = ncol(X))
+  n = nrow(X)
+  for (i in 1:S){
+    mu_1 = n*(xbar_1 + rho*theta_2 -    rho*xbar_2)/(n+1-rho^2)
+    var_1 = (1-rho^2)/(n+1-rho^2)
+    theta_1 = rnorm(1, mean = mu_1, sd = sqrt(var_1))
+    mu_2 = n*(xbar_2 + rho*theta_1 - rho*xbar_1)/(n+1 - rho^2)
+    var_2 = (1-rho^2)/(n+1-rho^2)
+    theta_2 = rnorm(1, mean = mu_2, sd = sqrt(var_2))
+    theta[i,1] = theta_1
+    theta[i,2] = theta_2
+  }
+  return(theta)
+}
+
+```
+
+```{r}
+set.seed(0)
+n <- 100
+rho <- 0.2
+X <- MASS::mvrnorm(n = n, mu = c(2, 4), Sigma = matrix(c(1, rho, rho, 1), nrow = 2))
+Sigma_post <- matrix(((1-rho^2)/((n+1-rho^2)^2 - (n^2)*(rho^2)))*c(n+1-rho^2, n*rho, n*rho, n+1-rho^2), nrow = 2)
+mu_post <- n*Sigma_post%*%matrix(c(1/(1-rho^2), -rho/(1-rho^2), 
+                                                       -rho/(1-rho^2), 1/(1-rho^2)), 
+                                                       nrow = 2)%*%colMeans(X)
+norm_gibbs_samps <- normal_gibbs_sampler(600, X, rho)
+#
+true_post <- MASS::mvrnorm(n = 100000, 
+                           mu = mu_post, 
+                           Sigma = Sigma_post)
+data.frame(norm_gibbs_samps) %>%
+  magrittr::set_colnames(c("theta_1", "theta_2")) %>%
+  dplyr::mutate(iter = 1:n()) %>%
+  dplyr::filter(iter > 100) %>%
+  dplyr::mutate(iter = 1:n()) %>%
+  ggplot2::ggplot() +
+  geom_density2d(data = data.frame(true_post) %>%
+                        magrittr::set_colnames(c("true_1", "true_2")),
+                 aes(x = true_1, y = true_2)) +
+  geom_path(aes(x = theta_1, y = theta_2, colour = iter), alpha = 0.2, size = 0.5) +
+  geom_point(aes(x = theta_1, y = theta_2, colour = iter), size = 0.5) +
+  scale_color_distiller(palette = "Spectral", name = "Iter") +
+  labs(x = expression(theta[1]), y = expression(theta[2])) +
+  xlim(c(mu_post[1] - 0.5, mu_post[1] + 0.5)) +
+  ylim(c(mu_post[2] - 0.5, mu_post[2] + 0.5))
+```
+I can't run stan file since my R would be aborted. So i only could compare it with in html. 
+
+```{r}
+n <- 100
+rho <- 0.995
+X <- MASS::mvrnorm(n = n, mu = c(2, 4), Sigma = matrix(c(1, rho, rho, 1), nrow = 2))
+Sigma_post <- matrix(((1-rho^2)/((n+1-rho^2)^2 - (n^2)*(rho^2)))*c(n+1-rho^2, n*rho, n*rho, n+1-rho^2), nrow = 2)
+mu_post <- n*Sigma_post%*%matrix(c(1/(1-rho^2), -rho/(1-rho^2), 
+                                                       -rho/(1-rho^2), 1/(1-rho^2)), 
+                                                       nrow = 2)%*%colMeans(X)
+norm_gibbs_samps <- normal_gibbs_sampler(600, X, rho)
+#
+true_post <- MASS::mvrnorm(n = 100000, 
+                           mu = n*Sigma_post%*%(matrix(c(1/(1-rho^2), -rho/(1-rho^2), 
+                                                       -rho/(1-rho^2), 1/(1-rho^2)), 
+                                                       nrow = 2)%*%colMeans(X)), 
+                           Sigma = Sigma_post)
+#
+data.frame(norm_gibbs_samps) %>%
+  magrittr::set_colnames(c("theta_1", "theta_2")) %>%
+  dplyr::mutate(iter = 1:n()) %>%
+  dplyr::filter(iter > 100) %>%
+  dplyr::mutate(iter = 1:n()) %>%
+  ggplot2::ggplot() +
+  geom_density2d(data = data.frame(true_post) %>%
+                        magrittr::set_colnames(c("true_1", "true_2")),
+                 aes(x = true_1, y = true_2)) +
+  geom_path(aes(x = theta_1, y = theta_2, colour = iter), alpha = 0.2, size = 0.5) +
+  geom_point(aes(x = theta_1, y = theta_2, colour = iter), size = 0.5) +
+  scale_color_distiller(palette = "Spectral", name = "Iter") +
+  labs(x = expression(theta[1]), y = expression(theta[2])) +
+  xlim(c(mu_post[1] - 0.5, mu_post[1] + 0.5)) +
+  ylim(c(mu_post[2] - 0.5, mu_post[2] + 0.5))
+```
+
+```{r}
+#
+par(mfrow = c(1,2))
+acf(norm_gibbs_samps[,1])
+acf(norm_gibbs_samps[,2])
+```
+
+
+### Exercise 5
+
+With increasing rho to 0.995, the center of generated plot from Gibbs sampling is further away from the (0,0) and it has less concentration. The reason of this is that we set our prior means is (0,0), and the correlation is increasing while rho is increasing, which means that we get high prior correlation and the thetas in Gibbs moved away from (0,0) in a lower pace. However, the generated plot from Stan file has nicer concentration and tends to concentrate to the true well density curve. 
+
+### Exercise 6
+
+Because we have larger rho in the Gibbs sampling, which means that the dependency between theta1 and theta2 is stronger. And the larger dependency causes the thetas moving very slowly, which is also a reason why we see that there are many simulated points are concentrated on the lower left corner and upper right corner, and the curve is really thin. 
